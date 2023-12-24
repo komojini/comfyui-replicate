@@ -24,8 +24,10 @@ build:
     - tqdm
     - psutil
     - websocket-client==1.6.3
-    - boto3
-    - gdown
+   # - boto3
+   # - gdown
+    - onnxruntime-gpu
+
   # run:
   #   - 
 
