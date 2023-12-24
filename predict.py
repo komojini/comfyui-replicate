@@ -20,7 +20,10 @@ from pathlib import Path as LocalPath
 
 sys.path.extend(["./ComfyUI/ComfyUI-to-Python-Extension", "./ComfyUI/ComfyUI-to-Python-Extension/output_files"])
 
-OUTPUT_PATH = LocalPath("./ComfyUI/output/")
+from ipadapter_faceid_upscale_replicate import main as generate_images, import_custom_nodes
+
+
+OUTPUT_PATH = LocalPath("/src/ComfyUI/output/")
 
 KSAMPLER_NAMES = ["euler", "euler_ancestral", "heun", "heunpp2","dpm_2", "dpm_2_ancestral",
                   "lms", "dpm_fast", "dpm_adaptive", "dpmpp_2s_ancestral", "dpmpp_sde", "dpmpp_sde_gpu",
@@ -34,9 +37,27 @@ CHECKPOINTS = [
    "darkSushiMixMix_225D.safetensors",
 ]
 
+FACE_RESTORE_MODELS = [
+    "GFPGANv1.4.pth",
+    "RestoreFormer.pth",
+]
+
+UPSCALER_MODELS = [
+    "4x-UltraSharp.pth",
+    "RealESRGAN_x4.pth",
+    "RealESRGAN_x2.pth",
+]
+
+VAE_MODELS = [
+    "vae-ft-mse-840000-ema-pruned.safetensors",
+]
+
+
 class Predictor(BasePredictor):
     def setup(self):
         print("Starting setup...")
+        import_custom_nodes()
+
 
     def predict(
         self,
@@ -54,15 +75,15 @@ class Predictor(BasePredictor):
         height: int = Input(default=768), 
         cfg: float = Input(default=8.0),
         seed: int = Input(description="Sampling seed, leave Empty for Random", default=None),
-        vae: str = Input(choices=["vae-ft-mse-840000-ema-pruned.safetensors"], default="vae-ft-mse-840000-ema-pruned.safetensors"),
+        vae: str = Input(choices=VAE_MODELS, default=VAE_MODELS[0]),
         sampler: str = Input(default=KSAMPLER_NAMES[0], choices=KSAMPLER_NAMES),
         scheduler: str = Input(default=SCHEDULER_NAMES[0], choices=SCHEDULER_NAMES),
+        face_restore_model: str = Input(default=FACE_RESTORE_MODELS[0], choices=FACE_RESTORE_MODELS),
+        upscaler_model: str = Input(default=UPSCALER_MODELS[0], choices=UPSCALER_MODELS),
     ) -> List[Path]:
         """Run a single prediction on the model"""
         print("Start prediction...")
         print(f"face image path: {face_image}")
-
-        from ipadapter_faceid_upscale_replicate import main as generate_images
 
         images = generate_images(
             positive_prompt,
@@ -79,6 +100,8 @@ class Predictor(BasePredictor):
             sampler=sampler,
             scheduler=scheduler,
             vae=vae,
+            face_restore_model=face_restore_model,
+            upscaler_model=upscaler_model,
         )
 
         image_paths = []
@@ -97,5 +120,5 @@ class Predictor(BasePredictor):
                 image_path = Path(str(image_path))
                 image_paths.append(image_path)
 
-        print(f"Prediction finished, {len(image_paths)} images generated.")
+        print(f"Prediction finished, {len(image_paths)} images generated: {image_paths}")
         return image_paths

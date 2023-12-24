@@ -16,3 +16,7 @@ __pycache__
 
 # Exclude Python virtual environment
 /venv
+
+ComfyUI/custom_nodes/ComfyUI-Manager
+ComfyUI/input/*
+ComfyUI/output/*
