@@ -7,6 +7,9 @@ build:
   system_packages:
     - ffmpeg
     - wget
+    - libsm6 
+    - libxext6
+    - python3-opencv
 
   python_packages:
     - torch
@@ -24,12 +27,25 @@ build:
     - tqdm
     - psutil
     - websocket-client==1.6.3
+    - insightface==0.7.3
+    - onnx>=1.14.0
+    - opencv-python==4.8.0.74
+    - numpy
+    - addict
+    - future
+    - lmdb
+    - requests
+    - scikit-image
+    - tb-nightly
+    - yapf
+    - lpips
+    - gdown
+    - GitPython
+    - matrix-client==0.4.0
+    - numba
    # - boto3
-   # - gdown
-    - onnxruntime-gpu
-
-  # run:
-  #   - 
+    - onnxruntime
+   # - onnxruntime-gpu
 
 # predict.py defines how predictions are run on your model
 predict: "predict.py:Predictor"
